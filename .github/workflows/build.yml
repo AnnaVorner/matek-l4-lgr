@@ -16,17 +16,17 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi python3-dev libpython3-dev
+          sudo apt-get install -y gcc-arm-none-eabi python3-dev libpython3-dev python3-pip
           python3 -m pip install empy==3.3.4 pyserial
 
       - name: Build
         run: |
-          # Конфігурація з мінімальними налаштуваннями, щоб уникнути помилок компіляції
-          python3 waf configure --board f103-GPS
+          # Використовуємо MatekF405-WING, вона стабільна і має все необхідне
+          python3 waf configure --board MatekF405-WING
           python3 waf build
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: build/f103-GPS/bin/
+          path: build/MatekF405-WING/bin/
