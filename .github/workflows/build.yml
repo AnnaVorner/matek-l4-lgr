@@ -1,0 +1,28 @@
+name: ArduPilot Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip git gcc-arm-none-eabi
+          pip3 install waf
+
+      - name: Build
+        run: |
+          ./waf configure --board f103-GPS --disable-scripting
+          ./waf build
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: build/f103-GPS/bin/
