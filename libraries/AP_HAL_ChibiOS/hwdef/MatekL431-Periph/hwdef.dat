@@ -1,10 +1,12 @@
 include ../MatekL431/hwdef.inc
 
-
-# --------------------- PWM -----------------------
+# --------------------- PWM & BUTTONS -----------------------
 PA8   TIM1_CH1  TIM1 PWM(1) GPIO(50)
-PA9   TIM1_CH2  TIM1 PWM(2) GPIO(51)
-PA10  TIM1_CH3  TIM1 PWM(3) GPIO(52)
+
+# Перетворюємо піни PWM(2) та PWM(3) на входи для кнопок
+PA10  BUTTON_DOWN INPUT PULLUP GPIO(52)
+PA9   BUTTON_UP   INPUT PULLUP GPIO(51)
+
 PA11  TIM1_CH4  TIM1 PWM(4) GPIO(53)
 PA15  TIM2_CH1  TIM2 PWM(5) GPIO(54)
 

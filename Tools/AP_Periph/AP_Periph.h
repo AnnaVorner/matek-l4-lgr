@@ -648,6 +648,20 @@ public:
     HAL_Semaphore canard_broadcast_semaphore;
 };
 
+#if AP_PERIPH_RC_OUT_ENABLED
+    // Цільове значення PWM для шасі (1000 - опущено, 2000 - піднято)
+    uint16_t landing_gear_target_pwm = 1000; 
+    
+    // Час останнього натискання кнопки для фільтрації брязкату контактів (джиттеру)
+    uint32_t last_button_press_ms = 0; 
+    
+    // Прапорець першої команди після увімкнення для обходу блокування
+    bool is_first_lgr_command = true; 
+    
+    // Метод для постійного опитування стану кнопок і керування шасі
+    void update_landing_gear_buttons();
+#endif
+
 #ifndef CAN_APP_NODE_NAME
 #define CAN_APP_NODE_NAME "org.ardupilot." CHIBIOS_BOARD_NAME
 #endif

@@ -567,6 +567,7 @@ void AP_Periph_FW::update()
 #if AP_PERIPH_BATTERY_BMS_ENABLED
     battery_bms.update();
 #endif
+    buttons_update();
 }
 
 #ifdef HAL_PERIPH_LISTEN_FOR_SERIAL_UART_REBOOT_CMD_PORT
@@ -661,3 +662,47 @@ AP_Periph_FW& AP::periph()
 }
 
 AP_HAL_MAIN();
+void AP_Periph_FW::buttons_update(void)
+{
+    static uint32_t last_button_action_ms = 0;
+    uint32_t now = AP_HAL::millis();
+
+    // Опитуємо кінцевики
+    bool btn_opened = (palReadLine(HAL_GPIO_PIN_BTN_OPENED) == 0);
+    bool btn_closed = (palReadLine(HAL_GPIO_PIN_BTN_CLOSED) == 0);
+
+    // Керування реле мотора
+    if (landing_gear_target_pwm == 1000) {
+        if (!btn_closed) {
+            palWriteLine(HAL_GPIO_PIN_RELAY_OPEN, 0);
+            palWriteLine(HAL_GPIO_PIN_RELAY_CLOSE, 1);
+        } else {
+            palWriteLine(HAL_GPIO_PIN_RELAY_CLOSE, 0);
+        }
+    } else if (landing_gear_target_pwm == 2000) {
+        if (!btn_opened) {
+            palWriteLine(HAL_GPIO_PIN_RELAY_CLOSE, 0);
+            palWriteLine(HAL_GPIO_PIN_RELAY_OPEN, 1);
+        } else {
+            palWriteLine(HAL_GPIO_PIN_RELAY_OPEN, 0);
+        }
+    }
+
+    // Обхід захисту автомата (Safety Button) кожні 50 мс
+    if (now - last_button_action_ms >= 50) {
+        last_button_action_ms = now;
+
+        ardupilot_indication_Button pkt {};
+        pkt.button = ARDUPILOT_INDICATION_BUTTON_BUTTON_SAFETY;
+        pkt.press_time = 1; 
+
+        uint8_t buffer[ARDUPILOT_INDICATION_BUTTON_MAX_SIZE];
+        uint16_t total_size = ardupilot_indication_Button_encode(&pkt, buffer, !canfdout());
+
+        canard_broadcast(ARDUPILOT_INDICATION_BUTTON_SIGNATURE,
+                         ARDUPILOT_INDICATION_BUTTON_ID,
+                         CANARD_TRANSFER_PRIORITY_LOW,
+                         &buffer[0],
+                         total_size);
+    }
+}
