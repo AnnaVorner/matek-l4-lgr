@@ -21,13 +21,18 @@ jobs:
 
       - name: Build
         run: |
-          # Конфігурація для плати MatekF405-WING
+          # Конфігурація та збірка
           python3 waf configure --board MatekF405-WING
           python3 waf build
+
+      - name: List files (Debug)
+        run: |
+          # Це допоможе нам побачити, де саме лежить файл, якщо він не з'явиться в артефактах
+          find build -name "*.bin"
+          find build -name "*.apj"
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
-          name: firmware
-          # Цей шлях вказує на папку, де лежить готовий файл .bin
-          path: build/MatekF405-WING/bin/
+          name: firmware-files
+          path: build/**/bin/*
