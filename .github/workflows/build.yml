@@ -13,13 +13,12 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip git gcc-arm-none-eabi
-          pip3 install waf
+          sudo apt-get install -y git gcc-arm-none-eabi python3-dev libpython3-dev
 
       - name: Build
         run: |
-          ./waf configure --board f103-GPS --disable-scripting
-          ./waf build
+          python3 waf configure --board f103-GPS --disable-scripting
+          python3 waf build
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
