@@ -21,7 +21,7 @@ jobs:
 
       - name: Build
         run: |
-          # Використовуємо MatekF405-WING, вона стабільна і має все необхідне
+          # Конфігурація для плати MatekF405-WING
           python3 waf configure --board MatekF405-WING
           python3 waf build
 
@@ -29,4 +29,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware
+          # Цей шлях вказує на папку, де лежить готовий файл .bin
           path: build/MatekF405-WING/bin/
